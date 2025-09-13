@@ -26,7 +26,7 @@ def format_size(size_bytes):
     return f"{size_bytes:.2f}TB"
 
 
-def compress_image(filepath, quality=70):
+def compress_image(filepath, quality=70, level=9):
     try:
         img = Image.open(filepath)
     except Exception as e:
@@ -48,11 +48,11 @@ def compress_image(filepath, quality=70):
             )
         elif img.format.upper() == "PNG":
             if "A" in img.getbands():
-                img.save(temp_filepath, "PNG", optimize=True, compress_level=9)
+                img.save(temp_filepath, "PNG", optimize=True, compress_level=level)
             else:
                 img = img.convert("RGB")
                 img = img.quantize(method=Image.MEDIANCUT)
-                img.save(temp_filepath, "PNG", optimize=True, compress_level=9)
+                img.save(temp_filepath, "PNG", optimize=True, compress_level=level)
         else:
             if img.mode in ("RGBA", "P"):
                 img = img.convert("RGB")
@@ -75,7 +75,8 @@ def compress_image(filepath, quality=70):
 
 def main():
     input_folder = "./"  # 启动脚本所在目录
-    quality = 70  # 压缩质量（1-100）
+    quality = 50  # 压缩质量（1-100）用于jpg
+    level = 10 # 压缩级别 用于png
 
     logging.info(f"当前工作目录：{os.getcwd()}")
     try:
@@ -96,7 +97,7 @@ def main():
                 continue
             logging.info(f"正在处理 {filename}，原始大小：{format_size(original_size)}")
 
-            compress_image(filepath, quality=quality)
+            compress_image(filepath, quality=quality, level=level)
 
             try:
                 new_size = os.path.getsize(filepath)
