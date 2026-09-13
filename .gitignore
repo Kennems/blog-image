@@ -1,0 +1,4 @@
+.compressed
+compress_errors.log
+.venv/
+__pycache__/

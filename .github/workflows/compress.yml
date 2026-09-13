@@ -1,0 +1,38 @@
+name: Compress Images
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '*.png'
+      - '*.jpg'
+      - '*.jpeg'
+
+permissions:
+  contents: write
+
+jobs:
+  compress:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - run: pip install Pillow
+
+      - name: Compress new images
+        run: |
+          changed=$(git diff --name-only --diff-filter=ACM HEAD~1 -- '*.png' '*.jpg' '*.jpeg')
+          if [ -n "$changed" ]; then
+            python compress.py compress $changed
+          fi
+
+      - name: Commit compressed images
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "compress: auto-optimize images"
